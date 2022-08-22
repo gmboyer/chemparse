@@ -55,6 +55,7 @@ def parse_formula(text):
     if "(" in text and ")" in text:
         parenth_list = re.findall(r"(?:\([^()]*\))?", text)
         parenth_list = [seg for seg in parenth_list if seg != '']
+        
         seg_dict_list = []
         if len(parenth_list) != 0:
             for seg in parenth_list:
@@ -65,9 +66,10 @@ def parse_formula(text):
                 seg_no_parenth = seg[1:-1]
                 seg_formula_dict = inner_parse_formula(seg_no_parenth)
                 seg_formula_dict_mult = {k:v*number for (k,v) in seg_formula_dict.items()}
-                endseg = re.sub(r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)", "", text.split(seg)[-1])
+                endseg = re.sub(r"(^(?=.)(([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)", "", text.split(seg)[-1])
                 text = text.split(seg)[0]+endseg
                 seg_dict_list.append(seg_formula_dict_mult)
+
         seg_dict_list.append(inner_parse_formula(text))
         
         # merge and sum all segments

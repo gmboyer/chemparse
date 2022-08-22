@@ -1,9 +1,0 @@
-README.md
-setup.py
-chemparse/__init__.py
-chemparse/fun.py
-chemparse.egg-info/PKG-INFO
-chemparse.egg-info/SOURCES.txt
-chemparse.egg-info/dependency_links.txt
-chemparse.egg-info/not-zip-safe
-chemparse.egg-info/top_level.txt
