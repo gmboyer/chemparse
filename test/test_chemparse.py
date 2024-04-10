@@ -1,7 +1,7 @@
 import sys
 sys.path.insert(0, "..")    #look for "chemparse" module in the directory ".." in the first place
-import pytest
-import chemparse
+import pytest, chemparse, os
+print(f"{os.path.basename(__file__)}:\nLoading module {chemparse.__file__}")
 
 species:list[tuple[str,dict[str,int]]] = [
     ("CH3",{"C":1, "H":3}),
