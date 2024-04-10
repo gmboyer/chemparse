@@ -1,5 +1,9 @@
 from typing import Any, Generator
 
+RE_SIGNED_NUMBER: str
+RE_NUMBER: str
+RE_LETTERS: str
+
 def find_all(sub: str, a_str: str) -> Generator[int, Any, None]: ...
 def get_first_elem(formula: str) -> tuple[str, bool]: ...
 def inner_parse_formula(text: str) -> dict[str, float]: ...

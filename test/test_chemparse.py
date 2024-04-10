@@ -1,3 +1,5 @@
+import sys
+sys.path.append("..")
 import pytest
 import chemparse
 
@@ -6,7 +8,8 @@ species:list[tuple[str,dict[str,int]]] = [
     ("Ga(CH3)3",{"Ga":1,"C":3, "H":9}),
     ("In(CH3)3",{"In":1,"C":3, "H":9}),
     ("Al(CH3)2NH2",{"Al":1,"C":2,"H":8,"N":1}),
-    ("CH3NHHNCH3", {"C":2, "H":8, "N":2})
+    ("CH3NHHNCH3", {"C":2, "H":8, "N":2}),
+    ("(CH3)2NH(HN)3CH3", {"C":3, "H":13, "N":4})
 ]
 
 def test_chemparse(formula:str, expected:dict[str,int]):

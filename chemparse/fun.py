@@ -1,6 +1,8 @@
 import re
 from typing import Generator
 from typing import Any
+# from .exceptions import NestedParenthesesError, ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
+from chemparse import exceptions
 
 RE_SIGNED_NUMBER:str = r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)"
 RE_NUMBER:str        =      r"(^(?=.)(([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)"
@@ -68,17 +70,16 @@ def parse_formula(text:str) -> dict[str, float]:
     closed_parenth_idx_list = find_occurrences(text, ")")
     
     if len(open_parenth_idx_list) != len(closed_parenth_idx_list):
-        raise Exception("Open and closed parentheses mismatch in formula '"+text+"'")
+        raise exceptions.ParenthesesMismatchError(text)
     
     for i in range(0, len(open_parenth_idx_list)-1):
         if open_parenth_idx_list[i+1] < closed_parenth_idx_list[i]:
-            msg = ("Cannot parse nested parentheses in formula '"+text+"'")
-            raise Exception(msg)
+            raise exceptions.NestedParenthesesError(text)
         if closed_parenth_idx_list[i] < open_parenth_idx_list[i]:
-            raise Exception("Closed parentheses detected before open parentheses in formula '"+text+"'")
+            raise exceptions.ClosedParenthesesBeforeOpenError(text)
         if i == len(open_parenth_idx_list)-1:
             if closed_parenth_idx_list[i+1] < open_parenth_idx_list[i+1]:
-                raise Exception("Closed parentheses detected before open parentheses in formula '"+text+"'")
+                raise exceptions.ClosedParenthesesBeforeOpenError(text)
     
     seg_dict_list:list[dict[str,float]] = []
     for _ in range(0, len(open_parenth_idx_list)):
