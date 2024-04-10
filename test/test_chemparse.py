@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, "..")    #look for "chemparse" module in the directory ".." in the first place
+sys.path.append("..")
 import pytest
 import chemparse
 
@@ -11,7 +11,11 @@ species:list[tuple[str,dict[str,int]]] = [
     ("CH3NHHNCH3", {"C":2, "H":8, "N":2}),
     ("(CH3)2NH(HN)3CH3", {"C":3, "H":13, "N":4}),
     ("BaKBi1O3",{'Ba': 1, 'K': 1, 'Bi': 1, 'O': 3}),
-    ("Al(Succ)+",{'+': 1, 'Al': 1, 'Succ': 1})
+    ("Al(Succ)+",{'+': 1, 'Al': 1, 'Succ': 1}),
+
+    ("((CH3)2)3",{'C': 6, 'H': 18}),
+    ("(Al(Ga2O)5)3",{'Al': 3, 'O': 15, 'Ga': 30}),
+    ("((CH3)2)3NH3",{'C': 6, 'N': 1, 'H': 21}),
 ]
 
 def test_chemparse(formula:str, expected:dict[str,int]):
