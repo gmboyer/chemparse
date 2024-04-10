@@ -2,6 +2,10 @@ import re
 from typing import Generator
 from typing import Any
 
+RE_SIGNED_NUMBER:str = r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)"
+RE_NUMBER:str        =      r"(^(?=.)(([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)"
+RE_LETTERS:str = r"^[a-zA-Z-+]+"
+
 # function to return index of all instances of a substring in a string
 def find_all(sub:str, a_str:str) -> Generator[int , Any , None]:
     start:int = 0
@@ -31,7 +35,7 @@ def get_first_elem(formula:str) -> tuple[str, bool]:
 def inner_parse_formula(text:str) -> dict[str, float]:
     formula_dict:dict[str,float] = {}
     for _ in range(0, len(text)):
-        element = re.findall("^[a-zA-Z-+]+", text)
+        element = re.findall(RE_LETTERS, text)
         if len(element) == 0:
             break
         else:
@@ -41,10 +45,10 @@ def inner_parse_formula(text:str) -> dict[str, float]:
                 number = 1.0
             else:
                 try:
-                    number = float(re.findall(r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)", text)[0][0])
+                    number = float(re.findall(RE_SIGNED_NUMBER, text)[0][0])
                 except:
                     number = 1.0
-                text = re.sub(r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)", "", text)
+                text = re.sub(RE_SIGNED_NUMBER, "", text)
             if element not in list(formula_dict.keys()):
                 formula_dict[element] = number
             else:
@@ -87,7 +91,7 @@ def parse_formula(text:str) -> dict[str, float]:
         seg = text[open_parenth_idx_list[0]:closed_parenth_idx_list[0]+1]
         
         try:
-            number = float(re.findall(r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)", text[closed_parenth_idx_list[0]+1:])[0][0])
+            number = float(re.findall(RE_SIGNED_NUMBER, text[closed_parenth_idx_list[0]+1:])[0][0])
         except:
             number = 1
         
@@ -95,7 +99,7 @@ def parse_formula(text:str) -> dict[str, float]:
         seg_formula_dict = inner_parse_formula(seg_no_parenth)
         seg_formula_dict_mult = {k:v*number for (k,v) in seg_formula_dict.items()}
 
-        endseg = re.sub(r"(^(?=.)(([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)", "", text[closed_parenth_idx_list[0]+1:])
+        endseg = re.sub(RE_NUMBER, "", text[closed_parenth_idx_list[0]+1:])
         text = text[:open_parenth_idx_list[0]]+endseg
         seg_dict_list.append(seg_formula_dict_mult)
 
