@@ -97,7 +97,8 @@ def parse_formula(text:str) -> dict[str, float]:
                 raise ClosedParenthesesBeforeOpenError(text)
     
     seg_dict_list:list[dict[str,float]] = []
-    for open_p_ind in range(0, len(open_parenth_idx_list)):
+    parenth_pairs_count = len(open_parenth_idx_list)
+    for _ in range(parenth_pairs_count):
         text = str(text)
         if len(text) <= 0:
             break
@@ -111,7 +112,7 @@ def parse_formula(text:str) -> dict[str, float]:
         first_parenth_match:int = get_first_parenth_match(text)
         if first_parenth_match < 0:
             raise ParenthesesMismatchError(text)
-        seg = text[open_parenth_idx_list[open_p_ind]:closed_parenth_idx_list[first_parenth_match]+1]
+        seg = text[open_parenth_idx_list[0]:closed_parenth_idx_list[first_parenth_match]+1]
         
         try:
             number = float(re.findall(RE_SIGNED_NUMBER, text[closed_parenth_idx_list[first_parenth_match]+1:])[0][0])
@@ -130,7 +131,7 @@ def parse_formula(text:str) -> dict[str, float]:
 
         endseg = re.sub(RE_NUMBER, "", text[closed_parenth_idx_list[first_parenth_match]+1:])
         # if not nested_parenth:
-        text = text[:open_parenth_idx_list[open_p_ind]]+endseg
+        text = text[:open_parenth_idx_list[0]]+endseg
         seg_dict_list.append(seg_formula_dict_mult)
 
     if '(' in text in text:
