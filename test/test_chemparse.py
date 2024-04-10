@@ -1,5 +1,5 @@
 import sys
-sys.path.append("..")
+sys.path.insert(0, "..")    #look for "chemparse" module in the directory ".." in the first place
 import pytest
 import chemparse
 
