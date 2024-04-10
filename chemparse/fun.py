@@ -2,7 +2,7 @@ import re
 from typing import Generator
 from typing import Any
 # from .exceptions import NestedParenthesesError, ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
-from chemparse import exceptions
+from .exceptions import NestedParenthesesError, ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
 
 RE_SIGNED_NUMBER:str = r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)"
 RE_NUMBER:str        =      r"(^(?=.)(([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)"
@@ -70,16 +70,16 @@ def parse_formula(text:str) -> dict[str, float]:
     closed_parenth_idx_list = find_occurrences(text, ")")
     
     if len(open_parenth_idx_list) != len(closed_parenth_idx_list):
-        raise exceptions.ParenthesesMismatchError(text)
+        raise ParenthesesMismatchError(text)
     
     for i in range(0, len(open_parenth_idx_list)-1):
         if open_parenth_idx_list[i+1] < closed_parenth_idx_list[i]:
-            raise exceptions.NestedParenthesesError(text)
+            raise NestedParenthesesError(text)
         if closed_parenth_idx_list[i] < open_parenth_idx_list[i]:
-            raise exceptions.ClosedParenthesesBeforeOpenError(text)
+            raise ClosedParenthesesBeforeOpenError(text)
         if i == len(open_parenth_idx_list)-1:
             if closed_parenth_idx_list[i+1] < open_parenth_idx_list[i+1]:
-                raise exceptions.ClosedParenthesesBeforeOpenError(text)
+                raise ClosedParenthesesBeforeOpenError(text)
     
     seg_dict_list:list[dict[str,float]] = []
     for _ in range(0, len(open_parenth_idx_list)):
@@ -115,3 +115,4 @@ def parse_formula(text:str) -> dict[str, float]:
         return start_dict
     else:
         return seg_dict_list[0]
+    
