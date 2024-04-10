@@ -1,0 +1,2 @@
+pytest -vv -s
+pause
