@@ -1,18 +1,15 @@
 import sys
 sys.path.insert(0, "..")    #look for "chemparse" module in the directory ".." in the first place
-import pytest
-import chemparse
-from chemparse.exceptions import NestedParenthesesError, ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
+import pytest, chemparse, os
+from chemparse.exceptions import ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
+
+print(f"{os.path.basename(__file__)}:\nLoading module {chemparse.__file__}")
 
 species: dict[str,list[str]] = {
     "formula_NestedParenthesesError":['((CH3)2)3'],
     "formula_ParenthesesMismatchError":["(CH3)3)"],
     "formula_ClosedParenthesesBeforeOpenError":[")(CH3)3("]
 }
-
-def test_NestedParenthesesError(formula_NestedParenthesesError:str):
-    with pytest.raises(NestedParenthesesError):
-        chemparse.parse_formula(formula_NestedParenthesesError)
 
 
 def test_ParenthesesMismatchError(formula_ParenthesesMismatchError:str):

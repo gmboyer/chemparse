@@ -2,7 +2,7 @@ import re
 from typing import Generator
 from typing import Any
 # from .exceptions import NestedParenthesesError, ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
-from .exceptions import NestedParenthesesError, ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
+from .exceptions import ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
 
 RE_SIGNED_NUMBER:str = r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)"
 RE_NUMBER:str        =      r"(^(?=.)(([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)"
@@ -59,7 +59,22 @@ def inner_parse_formula(text:str) -> dict[str, float]:
 
 def find_occurrences(s:str, ch:str) -> list[int]:
     return [i for i, letter in enumerate(s) if letter == ch]
+def get_first_parenth_match(text:str) -> int:
+    position:int = -1
+    ch_number:int = 0
+    closed_parenth_count: int = 0
+    opened_parenth_count: int = 0
+    for ch in text:
+        if ch == '(':
+            opened_parenth_count += 1
+        elif ch == ')':
+            closed_parenth_count += 1
+            if opened_parenth_count == closed_parenth_count:
+                position = closed_parenth_count - 1
+                break
+        ch_number += 1
 
+    return position
 
 def parse_formula(text:str) -> dict[str, float]:
     
@@ -73,8 +88,8 @@ def parse_formula(text:str) -> dict[str, float]:
         raise ParenthesesMismatchError(text)
     
     for i in range(0, len(open_parenth_idx_list)-1):
-        if open_parenth_idx_list[i+1] < closed_parenth_idx_list[i]:
-            raise NestedParenthesesError(text)
+        # if open_parenth_idx_list[i+1] < closed_parenth_idx_list[i]:
+        #     raise NestedParenthesesError(text)
         if closed_parenth_idx_list[i] < open_parenth_idx_list[i]:
             raise ClosedParenthesesBeforeOpenError(text)
         if i == len(open_parenth_idx_list)-1:
@@ -82,29 +97,47 @@ def parse_formula(text:str) -> dict[str, float]:
                 raise ClosedParenthesesBeforeOpenError(text)
     
     seg_dict_list:list[dict[str,float]] = []
-    for _ in range(0, len(open_parenth_idx_list)):
+    parenth_pairs_count = len(open_parenth_idx_list)
+    for _ in range(parenth_pairs_count):
         text = str(text)
+        if len(text) <= 0:
+            break
+        if not '(' in text and not ')' in text:
+            break
         
         # get indices of starting parentheses "(" and ending ")"
         open_parenth_idx_list = find_occurrences(text, "(")
         closed_parenth_idx_list = find_occurrences(text, ")")
 
-        seg = text[open_parenth_idx_list[0]:closed_parenth_idx_list[0]+1]
+        first_parenth_match:int = get_first_parenth_match(text)
+        if first_parenth_match < 0:
+            raise ParenthesesMismatchError(text)
+        seg = text[open_parenth_idx_list[0]:closed_parenth_idx_list[first_parenth_match]+1]
         
         try:
-            number = float(re.findall(RE_SIGNED_NUMBER, text[closed_parenth_idx_list[0]+1:])[0][0])
+            number = float(re.findall(RE_SIGNED_NUMBER, text[closed_parenth_idx_list[first_parenth_match]+1:])[0][0])
         except:
             number = 1
         
         seg_no_parenth = seg[1:-1]
-        seg_formula_dict = inner_parse_formula(seg_no_parenth)
+        # nested_parenth:bool = False
+        if '(' in seg_no_parenth or ')' in seg_no_parenth:
+            seg_formula_dict = parse_formula(seg_no_parenth)
+            # nested_parenth = True
+
+        else:
+            seg_formula_dict = inner_parse_formula(seg_no_parenth)
         seg_formula_dict_mult = {k:v*number for (k,v) in seg_formula_dict.items()}
 
-        endseg = re.sub(RE_NUMBER, "", text[closed_parenth_idx_list[0]+1:])
+        endseg = re.sub(RE_NUMBER, "", text[closed_parenth_idx_list[first_parenth_match]+1:])
+        # if not nested_parenth:
         text = text[:open_parenth_idx_list[0]]+endseg
         seg_dict_list.append(seg_formula_dict_mult)
 
-    seg_dict_list.append(inner_parse_formula(text))
+    if '(' in text in text:
+        seg_dict_list.append(parse_formula(text))
+    else:
+        seg_dict_list.append(inner_parse_formula(text))
 
     # merge and sum all segments
     if len(seg_dict_list) > 1:
