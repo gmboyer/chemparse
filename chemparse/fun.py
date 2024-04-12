@@ -1,8 +1,16 @@
 import re
+from typing import Generator
+from typing import Any
+# from .exceptions import NestedParenthesesError, ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
+from .exceptions import NestedParenthesesError, ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
+
+RE_SIGNED_NUMBER:str = r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)"
+RE_NUMBER:str        =      r"(^(?=.)(([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)"
+RE_LETTERS:str = r"^[a-zA-Z-+]+"
 
 # function to return index of all instances of a substring in a string
-def find_all(sub, a_str):
-    start = 0
+def find_all(sub:str, a_str:str) -> Generator[int , Any , None]:
+    start:int = 0
     while True:
         start = a_str.find(sub, start)
         if start == -1: return
@@ -10,8 +18,8 @@ def find_all(sub, a_str):
         start += len(sub) # use start += 1 to find overlapping matches
 
 # functions to parse elemental formulas (handles both floats and ints)
-def get_first_elem(formula):
-    needed_split = False
+def get_first_elem(formula:str) -> tuple[str, bool]:
+    needed_split:bool = False
     for char in formula:
         if formula.find(char) != 0 and (char.isupper() or char == "+" or char == "-"):
             formula = formula.split(char)[0]
@@ -26,11 +34,11 @@ def get_first_elem(formula):
 
     return formula, needed_split
 
-def inner_parse_formula(text):
-    formula_dict = {}
-    for i in range(0, len(text)):
-        element = re.findall("^[a-zA-Z-+]+", text)
-        if element == []:
+def inner_parse_formula(text:str) -> dict[str, float]:
+    formula_dict:dict[str,float] = {}
+    for _ in range(0, len(text)):
+        element = re.findall(RE_LETTERS, text)
+        if len(element) == 0:
             break
         else:
             element, needed_split = get_first_elem(element[0])
@@ -39,21 +47,21 @@ def inner_parse_formula(text):
                 number = 1.0
             else:
                 try:
-                    number = float(re.findall(r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)", text)[0][0])
+                    number = float(re.findall(RE_SIGNED_NUMBER, text)[0][0])
                 except:
                     number = 1.0
-                text = re.sub(r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)", "", text)
+                text = re.sub(RE_SIGNED_NUMBER, "", text)
             if element not in list(formula_dict.keys()):
                 formula_dict[element] = number
             else:
                 formula_dict[element] += number
     return formula_dict
 
-def find_occurrences(s, ch):
+def find_occurrences(s:str, ch:str) -> list[int]:
     return [i for i, letter in enumerate(s) if letter == ch]
 
 
-def parse_formula(text):
+def parse_formula(text:str) -> dict[str, float]:
     
     text = str(text)
     
@@ -62,20 +70,19 @@ def parse_formula(text):
     closed_parenth_idx_list = find_occurrences(text, ")")
     
     if len(open_parenth_idx_list) != len(closed_parenth_idx_list):
-        raise Exception("Open and closed parentheses mismatch in formula '"+text+"'")
+        raise ParenthesesMismatchError(text)
     
     for i in range(0, len(open_parenth_idx_list)-1):
         if open_parenth_idx_list[i+1] < closed_parenth_idx_list[i]:
-            msg = ("Cannot parse nested parentheses in formula '"+text+"'")
-            raise Exception(msg)
+            raise NestedParenthesesError(text)
         if closed_parenth_idx_list[i] < open_parenth_idx_list[i]:
-            raise Exception("Closed parentheses detected before open parentheses in formula '"+text+"'")
+            raise ClosedParenthesesBeforeOpenError(text)
         if i == len(open_parenth_idx_list)-1:
             if closed_parenth_idx_list[i+1] < open_parenth_idx_list[i+1]:
-                raise Exception("Closed parentheses detected before open parentheses in formula '"+text+"'")
+                raise ClosedParenthesesBeforeOpenError(text)
     
-    seg_dict_list = []
-    for seg_i in range(0, len(open_parenth_idx_list)):
+    seg_dict_list:list[dict[str,float]] = []
+    for _ in range(0, len(open_parenth_idx_list)):
         text = str(text)
         
         # get indices of starting parentheses "(" and ending ")"
@@ -85,7 +92,7 @@ def parse_formula(text):
         seg = text[open_parenth_idx_list[0]:closed_parenth_idx_list[0]+1]
         
         try:
-            number = float(re.findall(r"(^(?=.)([+-]?([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)", text[closed_parenth_idx_list[0]+1:])[0][0])
+            number = float(re.findall(RE_SIGNED_NUMBER, text[closed_parenth_idx_list[0]+1:])[0][0])
         except:
             number = 1
         
@@ -93,7 +100,7 @@ def parse_formula(text):
         seg_formula_dict = inner_parse_formula(seg_no_parenth)
         seg_formula_dict_mult = {k:v*number for (k,v) in seg_formula_dict.items()}
 
-        endseg = re.sub(r"(^(?=.)(([0-9]*)(\.([0-9]+))?)([eE][+-]?\d+)?)", "", text[closed_parenth_idx_list[0]+1:])
+        endseg = re.sub(RE_NUMBER, "", text[closed_parenth_idx_list[0]+1:])
         text = text[:open_parenth_idx_list[0]]+endseg
         seg_dict_list.append(seg_formula_dict_mult)
 
@@ -108,3 +115,4 @@ def parse_formula(text):
         return start_dict
     else:
         return seg_dict_list[0]
+    
