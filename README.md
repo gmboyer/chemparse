@@ -1,5 +1,7 @@
 # chemparse
 
+*Authors:* Grayson Boyer and Victor Ignatenko
+
 A lightweight package for parsing chemical formula strings into python dictionaries. 
 
 ## Features
@@ -11,6 +13,8 @@ A lightweight package for parsing chemical formula strings into python dictionar
     - example: `"H2e-1O1e-1"` returns `{"H":0.2, "O":0.1}`
 * Handles groups with parentheses.
     - example: `"(CH3)2(CH2)4"` returns `{"C":6.0, "H":14.0}`
+* *New in 2024* Chemparse now handles nested paretheses!
+    - example: `"((CH3)2)3"` returns `{'C': 6, 'H': 18}`
 
 ## Installation
 
@@ -29,3 +33,18 @@ import chemparse
 
 print(chemparse.parse_formula("C6H12O6"))
 ```
+
+## Contribute
+
+Install python
+
+Clone `chemparse` using git: \
+`git clone https://github.com/gmboyer/chemparse.git`
+
+Go to the `chemparse` directory: \
+`cd chemparse`
+
+Install requirements: \
+`pip install -r requirements.txt`
+
+Now you are ready to contribute!
