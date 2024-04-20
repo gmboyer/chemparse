@@ -19,6 +19,8 @@ species:list[tuple[str,dict[str,int]]] = [
     ("((CH3)2)3NH3",{'C': 6, 'N': 1, 'H': 21}),
     ("(Al(Ga2O3)5)3((CH3)2)3NH3",{'O': 45, 'Al': 3, 'H': 21, 'N': 1, 'C': 6, 'Ga': 30}),
     ("(Al(Ga2O3)5)3NH3((CH3)2)3",{'O': 45, 'Al': 3, 'H': 21, 'N': 1, 'C': 6, 'Ga': 30}),
+    ("K4[Fe(SCN)6]",{'S': 6, 'K': 4, 'N': 6, 'C': 6, "Fe":1}),
+    ("K4[Fe(SCN)6]2",{'S': 12, 'K': 4, 'N': 12, 'C': 12, "Fe":2}),
 ]
 
 def test_chemparse(formula:str, expected:dict[str,int]):
