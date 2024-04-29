@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="chemparse",
-    version="0.3.0",
+    version="0.3.1",
     author="Grayson Boyer, Victor Ignatenko",
     author_email="gmboyer@asu.edu, vityaig@yandex.ru",
     description="Chemical formula parser",

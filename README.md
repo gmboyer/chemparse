@@ -16,7 +16,7 @@ A lightweight package for parsing chemical formula strings into python dictionar
 * **New in 2024:** Chemparse now handles nested paretheses!
     - example: `"((CH3)2)3"` returns `{'C': 6, 'H': 18}`
 * **New in 2024:** Chemparse now handles square brackets
-    - example: `"K4[Fe(SCN)6]"` returns `{'S': 6.0, 'K': 4.0, 'N': 6.0, 'C': 6.0}`
+    - example: `"K4[Fe(SCN)6]"` returns `{'Fe': 1.0, 'K': 4.0, 'N': 6.0, 'S': 6.0, 'C': 6.0}`
 
 ## Installation
 
