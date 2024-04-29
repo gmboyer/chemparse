@@ -13,8 +13,10 @@ A lightweight package for parsing chemical formula strings into python dictionar
     - example: `"H2e-1O1e-1"` returns `{"H":0.2, "O":0.1}`
 * Handles groups with parentheses.
     - example: `"(CH3)2(CH2)4"` returns `{"C":6.0, "H":14.0}`
-* **New in 2024** Chemparse now handles nested paretheses!
+* **New in 2024:** Chemparse now handles nested paretheses!
     - example: `"((CH3)2)3"` returns `{'C': 6, 'H': 18}`
+* **New in 2024:** Chemparse now handles square brackets
+    - example: `"K4[Fe(SCN)6]"` returns `{'S': 6.0, 'K': 4.0, 'N': 6.0, 'C': 6.0}`
 
 ## Installation
 
