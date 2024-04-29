@@ -79,6 +79,8 @@ def get_first_parenth_match(text:str) -> int:
 def parse_formula(text:str) -> dict[str, float]:
     
     text = str(text)
+    text = text.replace("[", "(")
+    text = text.replace("]", ")")
     
     # get indices of starting parentheses "(" and ending ")"
     open_parenth_idx_list = find_occurrences(text, "(")
