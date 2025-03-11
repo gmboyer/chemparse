@@ -1,6 +1,6 @@
 import re
 from typing import Generator
-from typing import Any
+from typing import Any, Tuple, Dict, List
 # from .exceptions import NestedParenthesesError, ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
 from .exceptions import ParenthesesMismatchError, ClosedParenthesesBeforeOpenError
 
@@ -18,7 +18,7 @@ def find_all(sub:str, a_str:str) -> Generator[int , Any , None]:
         start += len(sub) # use start += 1 to find overlapping matches
 
 # functions to parse elemental formulas (handles both floats and ints)
-def get_first_elem(formula:str) -> tuple[str, bool]:
+def get_first_elem(formula:str) -> Tuple[str, bool]:
     needed_split:bool = False
     for char in formula:
         if formula.find(char) != 0 and (char.isupper() or char == "+" or char == "-"):
@@ -34,8 +34,8 @@ def get_first_elem(formula:str) -> tuple[str, bool]:
 
     return formula, needed_split
 
-def inner_parse_formula(text:str) -> dict[str, float]:
-    formula_dict:dict[str,float] = {}
+def inner_parse_formula(text:str) -> Dict[str, float]:
+    formula_dict:Dict[str,float] = {}
     for _ in range(0, len(text)):
         element = re.findall(RE_LETTERS, text)
         if len(element) == 0:
@@ -57,7 +57,7 @@ def inner_parse_formula(text:str) -> dict[str, float]:
                 formula_dict[element] += number
     return formula_dict
 
-def find_occurrences(s:str, ch:str) -> list[int]:
+def find_occurrences(s:str, ch:str) -> List[int]:
     return [i for i, letter in enumerate(s) if letter == ch]
 def get_first_parenth_match(text:str) -> int:
     position:int = -1
@@ -76,7 +76,7 @@ def get_first_parenth_match(text:str) -> int:
 
     return position
 
-def parse_formula(text:str) -> dict[str, float]:
+def parse_formula(text:str) -> Dict[str, float]:
     
     text = str(text)
     text = text.replace("[", "(")
@@ -98,7 +98,7 @@ def parse_formula(text:str) -> dict[str, float]:
             if closed_parenth_idx_list[i+1] < open_parenth_idx_list[i+1]:
                 raise ClosedParenthesesBeforeOpenError(text)
     
-    seg_dict_list:list[dict[str,float]] = []
+    seg_dict_list:List[Dict[str,float]] = []
     parenth_pairs_count = len(open_parenth_idx_list)
     for _ in range(parenth_pairs_count):
         text = str(text)
